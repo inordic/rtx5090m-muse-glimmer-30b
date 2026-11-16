@@ -100,6 +100,7 @@ Environment: LLAMA_ARG_CHAT_TEMPLATE_KWARGS={"reasoning_strength":"low"}
 | [`bench/agentreplay.py`](bench/agentreplay.py) | An agent-shaped session: long system prompt, 20 tools, simulated tool results, full history resent each step |
 | [`bench/agenttest.py`](bench/agenttest.py) | Tool-call protocol and task outcomes |
 | [`bench/score.sh`](bench/score.sh) | KLD against a Q8_0 reference, plus llama-bench |
+| [`bench/needle.py`](bench/needle.py) | Long-context retrieval (single needle, decoys, two-step) with prefill and decode speed. Needs `long_niah_256k.json` from the NInferno repository as the haystack |
 
 Build the reference logits for `score.sh` first, once per text:
 

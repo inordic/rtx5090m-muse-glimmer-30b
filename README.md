@@ -66,6 +66,7 @@ All four passed our agent-loop tool test with no errors, no tool markup returned
 - **Quality here is KLD against Q8_0, not BF16,** plus a small agent-loop tool test. Task-level evaluations (reasoning, coding, Swedish chat) are still to come.
 - **Muse Glimmer always reasons.** Set `reasoning_strength` once, server-side (we use `low` for agent turns). It sits in the system turn, so changing it per request breaks the prompt cache.
 - **These numbers are for one 175 W mobile GB203.** Desktop cards have more power and bandwidth and will behave differently.
+- **Context:** the unit uses Glimmer's native 131K. 262K fits in 24 GB with q8_0 KV, and single-fact lookups work to about 180K tokens. Questions with decoys or two steps fail already at 94K, at reasoning strength low. Details: [research/2026-11-16-long-context.md](research/2026-11-16-long-context.md).
 
 ## Credits
 
