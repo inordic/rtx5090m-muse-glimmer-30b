@@ -20,14 +20,21 @@ mkdir -p /opt/llama.cpp-glimmer && cp -a build/bin/. /opt/llama.cpp-glimmer/
 
 ## 2. Inputs
 
+Everything comes from Hugging Face. These are the revisions we used:
+
+| Input | Repository, revision | File | SHA256 |
+|---|---|---|---|
+| BF16 checkpoint (all files) → `$D/bf16` | `meta-models/Muse-Glimmer-30B` @ `cec94fcfd6512f2cfe708138c32533b346ea4f69` | | |
+| Agent-weighted imatrix | `AtomicChat/Muse-Glimmer-30B-GGUF` @ `6f4bcf4990aa5788c52f2dc13e2c13fd4bd9cb76` | `imatrix/muse-glimmer.imatrix.gguf`, saved as `$D/dl/atomicchat-agent.imatrix.gguf` | `eae2b1317b4412675b1b62e86e375a28f4930fd55e149f74f140f26bce0ab054` |
+| Drafter | `Anbeeld/Muse-Glimmer-30B-DFlash2-GGUF` @ `c773bd2827a726032f63f822a4e1fb367917d223` | `Muse-Glimmer-30B-DFlash2-Q4_K_M.gguf` | `9282f0053703623f89499dadb7e844ee0fd7b9c13de9a9840a726011e80ba1c4` |
+| Vision projector | `meta-models/Muse-Glimmer-30B-GGUF` @ `b44f1072cf75e918a1b82a3a17b45c4389b076e7` | `mmproj-Muse-Glimmer-30B-Q4_K_M.gguf` | `f48b452316f9b213758e8659444029b961a24a07f99a1abb2a9f88b06f7c00c6` |
+| Comparison file | `unsloth/Muse-Glimmer-30B-GGUF` @ `faa5b025c584459c13febfa5c59883516710ae39` | `Muse-Glimmer-30B-UD-Q4_K_XL.gguf` | `82bece304887a313ece08400bc030f6066c7bff5b906b0cd40308ec8a409fd38` |
+
+The calibration and evaluation texts come from `AtomicChat/calib-corpora` and Swedish Wikipedia. [`tools/make_corpus.py`](tools/make_corpus.py) downloads them from pinned revisions, builds the Swedish text and checks every file's sha256 (it needs `pyarrow`):
+
 ```bash
 D=/opt/models/muse-glimmer
-# Meta's BF16 checkpoint (all files of meta-models/Muse-Glimmer-30B) into $D/bf16
-# AtomicChat's agent-weighted imatrix:   AtomicChat/Muse-Glimmer-30B-GGUF  imatrix/muse-glimmer.imatrix.gguf
-# Calibration text:                      AtomicChat/calib-corpora  builds/muse-glimmer-30b/calib_train.txt  -> $D/corpus/
-# Swedish calibration text:              a few hundred Swedish Wikipedia articles  -> $D/corpus/eval_swedish.txt
-# Drafter:                               Anbeeld/Muse-Glimmer-30B-DFlash2-GGUF  Muse-Glimmer-30B-DFlash2-Q4_K_M.gguf
-# Vision projector:                      meta-models/Muse-Glimmer-30B-GGUF  mmproj-Muse-Glimmer-30B-Q4_K_M.gguf
+python3 tools/make_corpus.py $D/corpus   # ends with CORPUS_OK
 ```
 
 ## 3. BF16 GGUF
@@ -96,7 +103,7 @@ Environment: LLAMA_ARG_CHAT_TEMPLATE_KWARGS={"reasoning_strength":"low"}
 
 | Script | What it measures |
 |---|---|
-| [`bench/gbench.py`](bench/gbench.py) | Prefill on 2K/8K/32K/120K-character prompts (actual token counts recorded), decode after context, and 10 short chats, greedy and sampled with fixed seeds |
+| [`bench/gbench.py`](bench/gbench.py) | Prefill on 2K/8K/32K/120K-character prompts (actual token counts recorded), decode after context, and 10 short chats, greedy and sampled with fixed seeds. Uses `long_niah_256k.json` as prompt text, like `needle.py` |
 | [`bench/agentreplay.py`](bench/agentreplay.py) | An agent-shaped session: long system prompt, 20 tools, simulated tool results, full history resent each step |
 | [`bench/agenttest.py`](bench/agenttest.py) | Tool-call protocol and task outcomes |
 | [`bench/score.sh`](bench/score.sh) | KLD against a Q8_0 reference, plus llama-bench |

@@ -12,7 +12,9 @@ server's speculation record.
 """
 import argparse, json, statistics, sys, time, urllib.request, random
 
-HAY = "/opt/src/NInferno/examples/cli/messages/long_niah_256k.json"
+# Prompt text: examples/cli/messages/long_niah_256k.json from the NInferno repository (github.com/Brontir/NInferno),
+# placed next to this script or given as a path here.
+HAY = "long_niah_256k.json"
 CHAT = [
     "Write a Python function that merges overlapping intervals and explain its complexity.",
     "Write a SQL query that returns the top 3 customers by total order value per country, with table schemas you assume.",
