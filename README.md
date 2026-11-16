@@ -39,7 +39,7 @@ Raw prefill and decode come from `llama-bench` without a drafter. KLD is measure
 | ours: hybrid gate+up GPTQ-NVFP4, rest IQ4_XS | 15.64 GB | 3,055 / 2,930 | 44.3 | 0.047 / 0.024 / 0.027 | 96.3% |
 | **ours: hybrid MLP GPTQ-NVFP4, attention IQ4_XS** | 15.85 GB | **3,754 / 3,650** | 43.8 | 0.053 / 0.030 / 0.034 | 95.8% |
 
-Served with the patched llama.cpp, DFlash 2, the vision projector, 131K context and reasoning strength low:
+Served with the patched llama.cpp, DFlash 2, the vision projector, 131K context with f16 KV and reasoning strength low:
 
 | Setup | Prefill 1.7K / 6.9K / 27K / 101K tokens | Chat greedy / sampled | Cached agent turn |
 |---|---|---:|---:|
@@ -66,7 +66,7 @@ All four passed our agent-loop tool test with no errors, no tool markup returned
 - **Quality here is KLD against Q8_0, not BF16,** plus a small agent-loop tool test. Task-level evaluations (reasoning, coding, Swedish chat) are still to come.
 - **Muse Glimmer always reasons.** Set `reasoning_strength` once, server-side (we use `low` for agent turns). It sits in the system turn, so changing it per request breaks the prompt cache.
 - **These numbers are for one 175 W mobile GB203.** Desktop cards have more power and bandwidth and will behave differently.
-- **Context:** the unit uses Glimmer's native 131K. 262K fits in 24 GB with q8_0 KV, and single-fact lookups work to about 180K tokens. Questions with decoys or two steps fail already at 94K, at reasoning strength low. Details: [research/2026-11-16-long-context.md](research/2026-11-16-long-context.md).
+- **Context:** the unit serves 262K with q8_0 KV, past Glimmer's native 131K. It fits in 24 GB, and q8_0 KV moves the output no more than a different batch split does (KLD 0.040 against 0.039 for the control). It costs about 5% speed against 131K with f16 KV, the setup the tables above were measured with. Single-fact lookups work to about 180K tokens. Questions with decoys or two steps fail already at 94K, at reasoning strength low. Details: [research/2026-11-16-long-context.md](research/2026-11-16-long-context.md).
 
 ## Credits
 

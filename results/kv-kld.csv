@@ -1,0 +1,4 @@
+comparison,text,context,chunks,mean_kld,same_top1_pct,ppl_ratio
+q8_0 KV vs f16 KV,legal text (needle haystack),32768,2,0.039908,94.763,1.001158
+f16 KV ubatch 512 vs f16 KV ubatch 1024 (control),legal text (needle haystack),32768,2,0.039391,94.775,0.999609
+q8_0 KV vs f16 KV,eval_agentic.txt,8192,6,0.009468,99.605,1.000365

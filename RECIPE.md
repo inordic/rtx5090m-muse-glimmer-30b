@@ -89,13 +89,15 @@ python q_nvfp4.py build $D/own/glimmer-bf16.gguf $D/own/glimmer-nvfp4-all.gguf $
 See [`config/systemd/muse-glimmer-fast.service`](config/systemd/muse-glimmer-fast.service). The key flags:
 
 ```
---model glimmer-hyb-mlp.gguf --mmproj mmproj-…gguf --jinja --ctx-size 131072 --parallel 1 --flash-attn on --cache-type-k f16 --cache-type-v f16
+--model glimmer-hyb-mlp.gguf --mmproj mmproj-…gguf --jinja --parallel 1 --flash-attn on
+--override-kv muse-glimmer.context_length=int:262144 --ctx-size 262144 --cache-type-k q8_0 --cache-type-v q8_0
 --batch-size 4096 --ubatch-size 1024 --cache-prompt --cache-ram 16384 --fit off
 --spec-type draft-dflash2 --spec-draft-model Muse-Glimmer-30B-DFlash2-Q4_K_M.gguf --spec-draft-ngl 999 --spec-draft-n-max 15
 --spec-draft-sampling probabilistic --spec-draft-p-min 0
 Environment: LLAMA_ARG_CHAT_TEMPLATE_KWARGS={"reasoning_strength":"low"}
 ```
 
+- **Context:** 262K needs q8_0 KV; with f16 KV it runs out of memory on the first long prompt. q8_0 KV costs about 5% speed and no measurable quality. If requests never exceed 131K, `--ctx-size 131072 --cache-type-k f16 --cache-type-v f16` without the override is the faster choice. See [research/2026-11-16-long-context.md](research/2026-11-16-long-context.md).
 - **Draft depth:** use 15 with the NVFP4 hybrids, and 7 with K-quant files such as UD-Q4_K_XL.
 - **Vision:** with `--mmproj` loaded, llama.cpp turns `--cache-reuse` off. Agent turns are cached through context checkpoints and `--cache-ram` instead.
 
