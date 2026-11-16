@@ -1,0 +1,17 @@
+[Unit]
+Description=Muse Glimmer 30B fast: llama.cpp 75fd7f9 + Glimmer NVFP4 patches, MLP GPTQ-NVFP4 hybrid, DFlash2 depth 15
+After=network-online.target
+Wants=network-online.target
+Conflicts=muse-glimmer.service
+
+[Service]
+Type=simple
+Environment=LLAMA_ARG_CHAT_TEMPLATE_KWARGS={\"reasoning_strength\":\"low\"}
+Environment=LD_LIBRARY_PATH=/opt/llama.cpp-glimmer
+ExecStart=/opt/llama.cpp-glimmer/llama-server --model /opt/models/muse-glimmer/own/glimmer-hyb-mlp.gguf --mmproj /opt/models/muse-glimmer/mmproj-kquant.gguf --host <host> --port 8080 --gpu-layers 999 --device CUDA0 --cache-type-k f16 --cache-type-v f16 --jinja --ctx-size 131072 --parallel 1 --cont-batching --reasoning-preserve --flash-attn on --kv-unified --warmup --cache-prompt --batch-size 4096 --ubatch-size 1024 --fit off --cache-ram 16384 --spec-type draft-dflash2 --spec-draft-model /opt/models/muse-glimmer/dl/Muse-Glimmer-30B-DFlash2-Q4_K_M.gguf --spec-draft-ngl 999 --spec-draft-device CUDA0 --spec-draft-n-max 15 --spec-draft-type-k f16 --spec-draft-type-v f16 --spec-draft-sampling probabilistic --spec-draft-p-min 0
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target

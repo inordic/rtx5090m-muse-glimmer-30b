@@ -1,0 +1,13 @@
+diff --git a/ggml/src/ggml-cuda/mmvq.cu b/ggml/src/ggml-cuda/mmvq.cu
+index c6d895d..6648e77 100644
+--- a/ggml/src/ggml-cuda/mmvq.cu
++++ b/ggml/src/ggml-cuda/mmvq.cu
+@@ -330,6 +330,8 @@ bool ggml_cuda_should_use_mmvq(enum ggml_type type, int cc, int64_t ne11) {
+     }
+     if (GGML_CUDA_CC_IS_NVIDIA(cc) && cc == GGML_CUDA_CC_BLACKWELL) {
+         switch (type) { // tuned on RTX 5090
++            case GGML_TYPE_NVFP4: // MMQ (FP4 MMA) wins from 5 columns on the RTX 5090 Laptop GPU (DFlash verify batches)
++                return ne11 <= 4;
+             case GGML_TYPE_Q2_K:
+             case GGML_TYPE_Q3_K:
+             case GGML_TYPE_Q4_K:
